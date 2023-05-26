@@ -5,6 +5,7 @@ public class Guloso {
     private int[][] grafo; // Matriz de custos de viagem
     private List<Integer> caminhoMinimo; // Lista com o caminho de menor custo
     private int menorCusto = 0; // Menor custo encontrado
+    private static int tamanho;
 
     public void encontrarCaminhoMinimo(int[][] grafo) {
         this.grafo = grafo;
@@ -32,9 +33,8 @@ public class Guloso {
     private int melhorAtual(int nivel, boolean[] visitados){
         int melhorAtual = Integer.MAX_VALUE;
         int proximoVertice = 0;
-            for(int i=0; i<=9; i++){
+            for(int i=0; i<=tamanho; i++){
                 if(grafo[nivel][i] > 0 && grafo[nivel][i]< melhorAtual && !visitados[i]){
-                    
                     melhorAtual = grafo[nivel][i];
                     proximoVertice = i;
                 }
@@ -74,7 +74,8 @@ public class Guloso {
                 matriz[i][j] = valor;
                 matriz[j][i] = valor;
             }
-        }  
+        } 
+        tamanho = vertices; 
         return matriz;
     }
 
