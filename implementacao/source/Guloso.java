@@ -10,12 +10,11 @@ public class Guloso {
         this.grafo = grafo;
         int n = grafo.length; // Tamanho do grafo
         caminhoMinimo = new ArrayList<>(); // Lista com os vértices que irão compor o caminho mínimo
-        caminhoMinimo.add(0); // Inicia o caminho pelo vértice 0
 
         boolean[] visitados = new boolean[n]; // Lista booleana de vértices visitados
         visitados[0] = true; // Marca o vértice 0 como visitado
 
-        encontrarCaminhoMinimo(1, caminhoMinimo, visitados, 0);
+        encontrarCaminhoMinimo(0, caminhoMinimo, visitados, 0);
         caminhoMinimo.add(0); // Adiciona o vértice 0 ao final do caminho mínimos
     }
 
