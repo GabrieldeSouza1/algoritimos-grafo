@@ -4,12 +4,10 @@ import java.util.*;
 
 public class ForcaBruta {
 
-    private int[][] grafo;
     private List<Integer> caminhoMinimo;
     private int menorCusto = Integer.MAX_VALUE;
 
     public void encontrarCaminhoMinimo(int[][] grafo) {
-        this.grafo = grafo;
         int n = grafo.length;
         caminhoMinimo = new ArrayList<>();
 
@@ -19,12 +17,12 @@ public class ForcaBruta {
         boolean[] visitados = new boolean[n];
         visitados[0] = true;
 
-        encontrarCaminhoMinimo(1, caminhoAtual, visitados, 0);
+        encontrarCaminhoMinimo(grafo, 1, caminhoAtual, visitados, 0);
 
         caminhoMinimo.add(0);
     }
 
-    private void encontrarCaminhoMinimo(int nivel, List<Integer> caminhoAtual, boolean[] visitados, int custoAtual) {
+    private void encontrarCaminhoMinimo(int[][] grafo, int nivel, List<Integer> caminhoAtual, boolean[] visitados, int custoAtual) {
         if (nivel == grafo.length) {
             int custoTotal = custoAtual + grafo[caminhoAtual.get(caminhoAtual.size() - 1)][0];
 
@@ -42,7 +40,7 @@ public class ForcaBruta {
                 caminhoAtual.add(i);
                 visitados[i] = true;
 
-                encontrarCaminhoMinimo(nivel + 1, caminhoAtual, visitados, custoAtual + grafo[caminhoAtual.get(caminhoAtual.size() - 2)][i]);
+                encontrarCaminhoMinimo(grafo, nivel + 1, caminhoAtual, visitados, custoAtual + grafo[caminhoAtual.get(caminhoAtual.size() - 2)][i]);
 
                 caminhoAtual.remove(caminhoAtual.size() - 1);
                 visitados[i] = false;

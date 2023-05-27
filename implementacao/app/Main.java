@@ -1,6 +1,5 @@
 package implementacao.app;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -9,24 +8,23 @@ import implementacao.source.Guloso;
 
 public class Main {
     private static final double MAX_ITERATIONS_FB = 70.0;
-    private static final double MAX_ITERATIONS_GLOBAL = 10.0;
+    private static final double MAX_ITERATIONS_GLOBAL = 1000.0;
 
     public static void main(String[] args) {
-        int vertices = 12, countSameAnswer = 0;
+        int vertices = obterNMenosUm(), countSameAnswer = 0;
         long totalTimeFB = 0, totalTimeG = 0;
+        ForcaBruta forcaBruta = new ForcaBruta();
+        Guloso guloso = new Guloso();
 
         try {
             for(int i = 0; i < MAX_ITERATIONS_GLOBAL; i++) {
-                ForcaBruta forcaBruta = new ForcaBruta();
-                Guloso guloso = new Guloso();
-
                 int[][] grafo = grafoCompletoPonderado(vertices);
 
                 long startTime = System.currentTimeMillis();
                 forcaBruta.encontrarCaminhoMinimo(grafo);
                 long endTime = System.currentTimeMillis();
 
-                List<Integer> solucaoFB = forcaBruta.getCaminhoMinimo();
+                List<Integer> caminhoMinimoFB = forcaBruta.getCaminhoMinimo();
 
                 long elapsedTime = endTime - startTime;
                 totalTimeFB += elapsedTime;
@@ -35,9 +33,9 @@ public class Main {
                 guloso.encontrarCaminhoMinimo(grafo);
                 endTime = System.currentTimeMillis();
 
-                List<Integer> solucaoG = guloso.getCaminhoMinimo();
+                List<Integer> caminhoMinimoG = guloso.getCaminhoMinimo();
 
-                if(solucaoFB.equals(solucaoG)) {
+                if(caminhoMinimoFB.equals(caminhoMinimoG)) {
                     countSameAnswer++;
                 }
 
@@ -46,12 +44,18 @@ public class Main {
             }
 
             double averageTimeFB = totalTimeFB / MAX_ITERATIONS_GLOBAL;
+            System.out.println("Tempo total das iterações FB: " + totalTimeFB + "ms");
             System.out.println("Tempo médio das iterações FB: " + averageTimeFB + "ms");
 
-            double averageTimeG = totalTimeG / MAX_ITERATIONS_GLOBAL;
-            System.out.println("Tempo médio das iterações FB: " + averageTimeG + "ms");
+            System.out.println();
 
-            System.out.println("\nQuantidade de soluções obtidas iguais: " + countSameAnswer);
+            double averageTimeG = totalTimeG / MAX_ITERATIONS_GLOBAL;
+            System.out.println("Tempo total das iterações G: " + totalTimeG + "ms");
+            System.out.println("Tempo médio das iterações G: " + averageTimeG + "ms");
+
+            System.out.println();
+
+            System.out.println("Quantidade de soluções obtidas iguais: " + countSameAnswer);
         } catch(Exception err) {
             err.printStackTrace();
             System.out.println(err.getMessage());
@@ -101,7 +105,7 @@ public class Main {
     /**
      * Aleatório "fixo" para geração de testes repetitíveis
      */
-    static Random aleatorio = new Random(42);
+    static Random aleatorio = new Random();
 
     /**
      * Retorna uma matriz quadrada de "vertices" x "vertices" com números inteiros,
