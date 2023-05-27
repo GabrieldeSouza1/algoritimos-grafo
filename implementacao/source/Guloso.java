@@ -2,21 +2,21 @@ package implementacao.source;
 import java.util.*;
 public class Guloso {
 
-    private int[][] grafo; // Matriz de custos de viagem
-    private List<Integer> caminhoMinimo; // Lista com o caminho de menor custo
-    private int menorCusto = 0; // Menor custo encontrado
+    private int[][] grafo;
+    private List<Integer> caminhoMinimo;
+    private int menorCusto = 0;
     private static int tamanho;
 
     public void encontrarCaminhoMinimo(int[][] grafo) {
         this.grafo = grafo;
-        int n = grafo.length; // Tamanho do grafo
-        caminhoMinimo = new ArrayList<>(); // Lista com os vértices que irão compor o caminho mínimo
+        int n = grafo.length;
+        caminhoMinimo = new ArrayList<>();
 
-        boolean[] visitados = new boolean[n]; // Lista booleana de vértices visitados
-        visitados[0] = true; // Marca o vértice 0 como visitado
+        boolean[] visitados = new boolean[n];
+        visitados[0] = true;
 
         encontrarCaminhoMinimo(0, caminhoMinimo, visitados, 0);
-        caminhoMinimo.add(0); // Adiciona o vértice 0 ao final do caminho mínimos
+        caminhoMinimo.add(0);
     }
 
     private void encontrarCaminhoMinimo(int nivel, List<Integer> caminhoAtual, boolean[] visitados, int custoAtual) {
@@ -42,9 +42,9 @@ public class Guloso {
         return proximoVertice;
     }
 
-    private boolean acabou(boolean visitados[]){
-        for (boolean visitados2 : visitados) {
-            if(visitados2 == false){
+    private boolean acabou(boolean[] visitados){
+        for (boolean visitado : visitados) {
+            if(!visitado){
                 return false;
             }
         }
@@ -56,28 +56,6 @@ public class Guloso {
      * Aleatório "fixo" para geração de testes repetitíveis
      */
     static Random aleatorio = new Random(42);
-    
-    /**
-     * Retorna uma matriz quadrada de "vertices" x "vertices" com números inteiros,
-     * representando um grafo completo. A diagonal principal está preenchida com 
-     * valor -1, indicando que não há aresta.
-     * @param vertices A quantidade de vértices do grafo.
-     * @return Matriz quadrada com custos de movimentação entre os vértices.
-     */
-    public static int[][] grafoCompletoPonderado(int vertices){
-        int[][] matriz = new int[vertices][vertices];
-        int valor;
-        for (int i = 0; i < matriz.length; i++) {
-            matriz[i][i]=-1;         
-            for (int j = i+1; j < matriz.length; j++) {
-                valor = aleatorio.nextInt(25)+1;
-                matriz[i][j] = valor;
-                matriz[j][i] = valor;
-            }
-        } 
-        tamanho = vertices-1; 
-        return matriz;
-    }
 
     public int[][] getGrafo() {
         return grafo;
