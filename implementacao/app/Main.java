@@ -11,7 +11,7 @@ public class Main {
     private static final double MAX_ITERATIONS_FB = 70.0;
     private static final double MAX_ITERATIONS_GLOBAL = 10.0;
 
-    public static <err> void main(String[] args) {
+    public static void main(String[] args) {
         int vertices = 12, countSameAnswer = 0;
         long totalTimeFB = 0, totalTimeG = 0;
 

@@ -42,9 +42,9 @@ public class Guloso {
         return proximoVertice;
     }
 
-    private boolean acabou(boolean visitados[]){
-        for (boolean visitados2 : visitados) {
-            if(visitados2 == false){
+    private boolean acabou(boolean[] visitados){
+        for (boolean visitado : visitados) {
+            if(!visitado){
                 return false;
             }
         }
