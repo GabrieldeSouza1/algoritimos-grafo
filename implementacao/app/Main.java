@@ -98,14 +98,10 @@ public class Main {
             }
         }
         System.out.println("Número N-1: " + nMinusOne);
+        System.out.println();
 
         return nMinusOne;
     }
-
-    /**
-     * Aleatório "fixo" para geração de testes repetitíveis
-     */
-    static Random aleatorio = new Random();
 
     /**
      * Retorna uma matriz quadrada de "vertices" x "vertices" com números inteiros,
@@ -114,7 +110,8 @@ public class Main {
      * @param vertices A quantidade de vértices do grafo.
      * @return Matriz quadrada com custos de movimentação entre os vértices.
      */
-    public static int[][] grafoCompletoPonderado(int vertices){
+    public static int[][] grafoCompletoPonderado(int vertices) {
+        Random aleatorio = new Random();
         int[][] matriz = new int[vertices][vertices];
         int valor;
 
@@ -122,7 +119,7 @@ public class Main {
             matriz[i][i] = -1;
 
             for (int j = i + 1; j < matriz.length; j++) {
-                valor = aleatorio.nextInt(25)+1;
+                valor = aleatorio.nextInt(25) + 1;
                 matriz[i][j] = valor;
                 matriz[j][i] = valor;
             }
