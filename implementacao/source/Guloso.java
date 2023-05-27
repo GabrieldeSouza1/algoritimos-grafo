@@ -75,7 +75,7 @@ public class Guloso {
                 matriz[j][i] = valor;
             }
         } 
-        tamanho = vertices; 
+        tamanho = vertices-1; 
         return matriz;
     }
 
