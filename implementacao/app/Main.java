@@ -65,38 +65,42 @@ public class Main {
     public static int obterNMenosUm() {
         int vertices = 5;
         int nMinusOne = 0;
-        long totalTime;
+        long totalElapsedTime;
         boolean minusFourMin = true;
+        long startTotalTime = System.currentTimeMillis();
 
         while (minusFourMin) {
-            long elapsedTime = 0;
-            totalTime = 0;
+            totalElapsedTime = 0;
 
             for (int i = 0; i < MAX_ITERATIONS_FB; i++) {
                 int[][] grafo = grafoCompletoPonderado(vertices);
 
-                long startTime = System.currentTimeMillis();
+                long startElapsedTime = System.currentTimeMillis();
                 ForcaBruta caixeiroViajante = new ForcaBruta();
                 caixeiroViajante.encontrarCaminhoMinimo(grafo);
-                long endTime = System.currentTimeMillis();
+                long endElapsedTime = System.currentTimeMillis();
 
-                elapsedTime = endTime - startTime;
-                totalTime += elapsedTime;
+                long elapsedTime = endElapsedTime - startElapsedTime;
+                totalElapsedTime += elapsedTime;
 
                 if(elapsedTime > 3500) {
                     nMinusOne = vertices - 1;
                     minusFourMin = false;
-                    break;
                 }
             }
 
-            if(minusFourMin) {
-                double averageTime = totalTime / MAX_ITERATIONS_FB;
-                System.out.println("Tempo médio das iterações: " + averageTime + "ms");
+                double averageElapsedTime = totalElapsedTime / MAX_ITERATIONS_FB;
+                System.out.println("Tempo médio das iterações n=" + vertices +": " + averageElapsedTime + "ms");
 
+            if(minusFourMin) {
                 vertices++;
-            }
+            } else break;
         }
+
+        long endTotalTime = System.currentTimeMillis();
+        System.out.println();
+        System.out.println("Tempo total para achar n-1: " + (endTotalTime - startTotalTime) + "ms");
+        System.out.println();
         System.out.println("Número N-1: " + nMinusOne);
         System.out.println();
 
@@ -119,7 +123,7 @@ public class Main {
             matriz[i][i] = -1;
 
             for (int j = i + 1; j < matriz.length; j++) {
-                valor = aleatorio.nextInt(25) + 1;
+                valor = aleatorio.nextInt(10) + 1;
                 matriz[i][j] = valor;
                 matriz[j][i] = valor;
             }
