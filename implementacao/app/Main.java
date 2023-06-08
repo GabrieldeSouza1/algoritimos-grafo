@@ -131,29 +131,4 @@ public class Main {
 
         return matriz;
     }
-
-    /**
-     * Retorna uma matriz quadrada de "vertices" x "vertices" com números inteiros,
-     * representando um grafo completo. A diagonal principal está preenchida com
-     * valor -1, indicando que não há aresta.
-     * @param vertices A quantidade de vértices do grafo.
-     * @return Matriz quadrada com custos de movimentação entre os vértices.
-     */
-    public static int[][] grafoCompletoPonderado(int vertices) {
-        Random aleatorio = new Random();
-        int[][] matriz = new int[vertices][vertices];
-        int valor;
-
-        for (int i = 0; i < matriz.length; i++) {
-            matriz[i][i] = -1;
-
-            for (int j = i + 1; j < matriz.length; j++) {
-                valor = aleatorio.nextInt(10) + 1;
-                matriz[i][j] = valor;
-                matriz[j][i] = valor;
-            }
-        }
-
-        return matriz;
-    }
 }
