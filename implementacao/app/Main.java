@@ -1,44 +1,134 @@
 package implementacao.app;
 
 import java.util.List;
+import java.util.Random;
 
 import implementacao.source.ForcaBruta;
+import implementacao.source.Guloso;
 
 public class Main {
+    private static final double MAX_ITERATIONS_FB = 70.0;
+    private static final double MAX_ITERATIONS_GLOBAL = 1000.0;
+
     public static void main(String[] args) {
-        int vertices = 10; // Número de vértices do grafo
-        int[][] grafo = ForcaBruta.grafoCompletoPonderado(vertices);
-
-        imprimirMatriz(grafo);
-
+        int vertices = obterNMenosUm(), countSameAnswer = 0;
+        long totalTimeFB = 0, totalTimeG = 0;
         ForcaBruta forcaBruta = new ForcaBruta();
-        forcaBruta.encontrarCaminhoMinimo(grafo);
+        Guloso guloso = new Guloso();
 
-        List<Integer> caminhoMinimo = forcaBruta.getCaminhoMinimo();
-        int custoMinimo = forcaBruta.getMenorCusto();
+        try {
+            for(int i = 0; i < MAX_ITERATIONS_GLOBAL; i++) {
+                int[][] grafo = grafoCompletoPonderado(vertices);
 
-        System.out.println("Caminho de menor custo: ");
-        caminhoMinimo.forEach(vertice -> System.out.println(vertice));
-        System.out.println("\nCusto mínimo: " + custoMinimo);
+                long startTime = System.currentTimeMillis();
+                forcaBruta.encontrarCaminhoMinimo(grafo);
+                long endTime = System.currentTimeMillis();
+
+                List<Integer> caminhoMinimoFB = forcaBruta.getCaminhoMinimo();
+
+                long elapsedTime = endTime - startTime;
+                totalTimeFB += elapsedTime;
+
+                startTime = System.currentTimeMillis();
+                guloso.encontrarCaminhoMinimo(grafo);
+                endTime = System.currentTimeMillis();
+
+                List<Integer> caminhoMinimoG = guloso.getCaminhoMinimo();
+
+                if(caminhoMinimoFB.equals(caminhoMinimoG)) {
+                    countSameAnswer++;
+                }
+
+                elapsedTime = endTime - startTime;
+                totalTimeG += elapsedTime;
+            }
+
+            double averageTimeFB = totalTimeFB / MAX_ITERATIONS_GLOBAL;
+            System.out.println("Tempo total das iterações FB: " + totalTimeFB + "ms");
+            System.out.println("Tempo médio das iterações FB: " + averageTimeFB + "ms");
+
+            System.out.println();
+
+            double averageTimeG = totalTimeG / MAX_ITERATIONS_GLOBAL;
+            System.out.println("Tempo total das iterações G: " + totalTimeG + "ms");
+            System.out.println("Tempo médio das iterações G: " + averageTimeG + "ms");
+
+            System.out.println();
+
+            System.out.println("Quantidade de soluções obtidas iguais: " + countSameAnswer);
+        } catch(Exception err) {
+            err.printStackTrace();
+            System.out.println(err.getMessage());
+        }
     }
 
-    private static void imprimirMatriz(int[][] matriz) {
-        int tamanho = matriz.length;
+    public static int obterNMenosUm() {
+        int vertices = 5;
+        int nMinusOne = 0;
+        long totalElapsedTime;
+        boolean minusFourMin = true;
+        long startTotalTime = System.currentTimeMillis();
 
-        // Imprimir cabeçalho com os números das colunas
-        System.out.print("    ");
-        for (int i = 0; i < tamanho; i++) {
-            System.out.printf("%2d ", i);
+        while (minusFourMin) {
+            totalElapsedTime = 0;
+
+            for (int i = 0; i < MAX_ITERATIONS_FB; i++) {
+                int[][] grafo = grafoCompletoPonderado(vertices);
+
+                long startElapsedTime = System.currentTimeMillis();
+                ForcaBruta caixeiroViajante = new ForcaBruta();
+                caixeiroViajante.encontrarCaminhoMinimo(grafo);
+                long endElapsedTime = System.currentTimeMillis();
+
+                long elapsedTime = endElapsedTime - startElapsedTime;
+                totalElapsedTime += elapsedTime;
+
+                if(elapsedTime > 3500) {
+                    nMinusOne = vertices - 1;
+                    minusFourMin = false;
+                }
+            }
+
+                double averageElapsedTime = totalElapsedTime / MAX_ITERATIONS_FB;
+                System.out.println("Tempo médio das iterações n=" + vertices +": " + averageElapsedTime + "ms");
+
+            if(minusFourMin) {
+                vertices++;
+            } else break;
         }
+
+        long endTotalTime = System.currentTimeMillis();
+        System.out.println();
+        System.out.println("Tempo total para achar n-1: " + (endTotalTime - startTotalTime) + "ms");
+        System.out.println();
+        System.out.println("Número N-1: " + nMinusOne);
         System.out.println();
 
-        // Imprimir linhas da matriz com números das linhas e elementos
-        for (int i = 0; i < tamanho; i++) {
-            System.out.printf("%2d: ", i);
-            for (int j = 0; j < tamanho; j++) {
-                System.out.printf("%2d ", matriz[i][j]);
+        return nMinusOne;
+    }
+
+    /**
+     * Retorna uma matriz quadrada de "vertices" x "vertices" com números inteiros,
+     * representando um grafo completo. A diagonal principal está preenchida com
+     * valor -1, indicando que não há aresta.
+     * @param vertices A quantidade de vértices do grafo.
+     * @return Matriz quadrada com custos de movimentação entre os vértices.
+     */
+    public static int[][] grafoCompletoPonderado(int vertices) {
+        Random aleatorio = new Random();
+        int[][] matriz = new int[vertices][vertices];
+        int valor;
+
+        for (int i = 0; i < matriz.length; i++) {
+            matriz[i][i] = -1;
+
+            for (int j = i + 1; j < matriz.length; j++) {
+                valor = aleatorio.nextInt(10) + 1;
+                matriz[i][j] = valor;
+                matriz[j][i] = valor;
             }
-            System.out.println();
         }
+
+        return matriz;
     }
 }
