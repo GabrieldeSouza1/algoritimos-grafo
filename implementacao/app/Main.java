@@ -2,15 +2,58 @@ package implementacao.app;
 
 import java.util.List;
 import java.util.Random;
+import java.util.prefs.BackingStoreException;
 
+import implementacao.source.Backtracking;
 import implementacao.source.ForcaBruta;
 import implementacao.source.Guloso;
+import implementacao.source.ProgramacaoDinamica;
 
 public class Main {
     private static final double MAX_ITERATIONS_FB = 70.0;
     private static final double MAX_ITERATIONS_GLOBAL = 1000.0;
 
     public static void main(String[] args) {
+        ForcaBruta forcaBruta = new ForcaBruta();
+        Backtracking backtracking = new Backtracking();
+        ProgramacaoDinamica programacaoDinamica = new ProgramacaoDinamica();
+
+        int[][] grafo = grafoCompletoPonderado(10);
+
+        System.out.println("----------------------Força Bruta------------------------");
+
+        long startTimeBrute = System.currentTimeMillis();
+        forcaBruta.encontrarCaminhoMinimo(grafo);
+        List<Integer> caminhoMinimoBrute = forcaBruta.getCaminhoMinimo();
+        caminhoMinimoBrute.forEach(vertice -> System.out.println(vertice));
+        long endTimeBrute = System.currentTimeMillis();
+        long elapsedTimeBrute = endTimeBrute - startTimeBrute;
+
+        System.out.println("\n----------------------Backtracking------------------------");
+
+        long startTimeBacktracking = System.currentTimeMillis();
+        backtracking.encontrarCaminhoMinimo(grafo);
+        List<Integer> caminhoMinimoBack = backtracking.getCaminhoMinimo();
+        caminhoMinimoBack.forEach(vertice -> System.out.println(vertice));
+        long endTimeBacktracking = System.currentTimeMillis();
+        long elapsedTimeBacktracking = endTimeBacktracking - startTimeBacktracking;
+
+
+        System.out.println("\n----------------------Programação Dinâmica------------------------");
+
+        long startTimeProgDinamica = System.currentTimeMillis();
+        programacaoDinamica.encontrarCaminhoMinimo(grafo);
+        List<Integer> caminhoMinimoProgDinamica = programacaoDinamica.getCaminhoMinimo();
+        caminhoMinimoProgDinamica.forEach(vertice -> System.out.println(vertice));
+        long endTimeProgDinamica = System.currentTimeMillis();
+        long elapsedTimeProgDinamica = endTimeProgDinamica - startTimeProgDinamica;
+
+        System.out.println("O tempo do força bruta foi de: "+elapsedTimeBrute+"ms");
+        System.out.println("O tempo do backtracking foi de: "+elapsedTimeBacktracking+"ms");
+        System.out.println("O tempo da programação dinâmica foi de: "+elapsedTimeProgDinamica+"ms");
+    }
+
+    public static void testarForcaBrutaEGuloso(){
         int vertices = obterNMenosUm(), countSameAnswer = 0;
         long totalTimeFB = 0, totalTimeG = 0;
         ForcaBruta forcaBruta = new ForcaBruta();
