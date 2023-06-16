@@ -7,7 +7,7 @@ public class ProgramacaoDinamica {
 
     private static List<Integer> caminhoMinimo;
 
-    public static void encontrarCaminhoMinimo(int[][] grafo) {
+    public void encontrarCaminhoMinimo(int[][] grafo) {
         int n = grafo.length;
         caminhoMinimo = new ArrayList<>();
         int[][] tabela = new int[1 << n][n]; // Tabela de programação dinâmica
@@ -46,7 +46,9 @@ public class ProgramacaoDinamica {
             ultimaCidade = -1;
             for (int i = 0; i < n; i++) {
                 if ((proximoSubconjunto & (1 << i)) != 0) {
-                    if (ultimaCidade == -1 || tabela[proximoSubconjunto][i] + grafo[i][cidadeAnterior] < tabela[proximoSubconjunto][ultimaCidade] + grafo[ultimaCidade][cidadeAnterior]) {
+                    if (ultimaCidade == -1 || tabela[proximoSubconjunto][i]
+                            + grafo[i][cidadeAnterior] < tabela[proximoSubconjunto][ultimaCidade]
+                                    + grafo[ultimaCidade][cidadeAnterior]) {
                         ultimaCidade = i;
                     }
                 }
@@ -56,7 +58,6 @@ public class ProgramacaoDinamica {
         caminhoMinimo.add(0); // Adicionar a cidade inicial novamente para fechar o ciclo
     }
 
-    
     public List<Integer> getCaminhoMinimo() {
         return caminhoMinimo;
     }
