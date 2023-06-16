@@ -3,12 +3,49 @@ package implementacao.source;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 import javax.swing.*;
 
 public class planoConvexo {
 
-    public ArrayList<Point2D> gerarPontos() {
+    /*
+     * 1º Chamar o gerar pontos que irá retornar uma lista de pontos
+     * 2º Chamar o método gerarTriangulos passando a lista de pontos que irá
+     * retornar uma lista de listas
+     * 3ª Se quiser mostrar os triagulos formados, chamar o metodo
+     * desenharTriangulos passando a lista de pontos e a lista de triangulos
+     * 4ª Chamar o metodo onThread ou noThread passado a lista de triangulos
+     * Exemplo de uso:
+     * 
+     * ArrayList<Point2D> listaDePontos = planoConvexo.gerarPontos();
+     * 
+     * ArrayList<ArrayList<Point2D>> listaTriangulo =
+     * planoConvexo.gerarTriagulos(listaDePontos);
+     * 
+     * long comecoSem = System.currentTimeMillis();
+     * ArrayList<Point2D> resultadoPlanoConvexoNoThread =
+     * planoConvexo.noThread(listaTriangulo);
+     * long fimSem = System.currentTimeMillis();
+     * 
+     * ArrayList<ArrayList<Point2D>> listaTriangulo2 = new
+     * ArrayList<>(listaTriangulo);
+     * listaTriangulo2.addAll(listaTriangulo);
+     * long comecoCom = System.currentTimeMillis();
+     * ArrayList<Point2D> resultadoPlanoConvexoOnThread =
+     * planoConvexo.onThread(listaTriangulo2);
+     * long fimCom = System.currentTimeMillis();
+     * System.out.println("Sem thread: " + (fimSem-comecoSem) + "ms");
+     * 
+     * 
+     * 
+     * System.out.println("Com thread: " + (fimCom-comecoCom) + "ms");
+     * planoConvexo.desenharPontosComLinhas(resultadoPlanoConvexoNoThread,
+     * listaDePontos);
+     */
+
+    public static ArrayList<Point2D> gerarPontos() {
         ArrayList<Point2D> listaPontos = new ArrayList<>();
         Random random = new Random();
 
@@ -18,6 +55,106 @@ public class planoConvexo {
         }
 
         return listaPontos;
+    }
+
+    public static ArrayList<ArrayList<Point2D>> gerarTriagulos(ArrayList<Point2D> listaPontos) {
+
+        ArrayList<ArrayList<Point2D>> listaTriangulos = new ArrayList<>();
+        // Ordenar a lista de pontos com base no valor x
+        Collections.sort(listaPontos, Comparator.comparingDouble(Point2D::getX));
+
+        for (int i = 0; i < listaPontos.size() - 2; i += 3) {
+            Point2D ponto1 = listaPontos.get(i);
+            Point2D ponto2 = listaPontos.get(i + 1);
+            Point2D ponto3 = listaPontos.get(i + 2);
+            // Salvar os pontos utilizados em uma nova sublista
+            ArrayList<Point2D> triangulo = new ArrayList<>();
+            triangulo.add(ponto1);
+            triangulo.add(ponto2);
+            triangulo.add(ponto3);
+            listaTriangulos.add(triangulo);
+        }
+
+        if (listaPontos.size() % 3 == 1) {
+            ArrayList<Point2D> triangulo = new ArrayList<>();
+            triangulo.add(listaPontos.get(listaPontos.size() - 1));
+            listaTriangulos.add(triangulo);
+        }
+
+        if (listaPontos.size() % 3 == 2) {
+            ArrayList<Point2D> triangulo = new ArrayList<>();
+            triangulo.add(listaPontos.get(listaPontos.size() - 2));
+            triangulo.add(listaPontos.get(listaPontos.size() - 1));
+            listaTriangulos.add(triangulo);
+        }
+
+        return listaTriangulos;
+    }
+
+    public static ArrayList<Point2D> merge(ArrayList<Point2D> pedaco1, ArrayList<Point2D> pedaco2) {
+        ArrayList<Point2D> resultado = new ArrayList<>();
+
+        // Adicione o código para mesclar os pedaços aqui
+        // ...
+        resultado.addAll(pedaco1);
+        resultado.addAll(pedaco2);
+        // Encontre o casco convexo dos pontos resultantes do merge
+        ArrayList<Point2D> convexHull = convexHull(resultado);
+
+        return convexHull;
+    }
+
+    public static ArrayList<Point2D> convexHull(ArrayList<Point2D> pontos) {
+        ArrayList<Point2D> hull = new ArrayList<>();
+
+        // Encontre o ponto mais à esquerda
+        Point2D pontoMaisEsquerda = pontos.get(0);
+        for (int i = 1; i < pontos.size(); i++) {
+            Point2D pontoAtual = pontos.get(i);
+            if (pontoAtual.getX() < pontoMaisEsquerda.getX()) {
+                pontoMaisEsquerda = pontoAtual;
+            }
+        }
+
+        hull.add(pontoMaisEsquerda);
+        Point2D pontoAtual = pontoMaisEsquerda;
+        Point2D proximoPonto;
+
+        do {
+            proximoPonto = pontos.get(0);
+
+            for (int i = 1; i < pontos.size(); i++) {
+                Point2D ponto = pontos.get(i);
+                if (ponto.equals(pontoAtual)) {
+                    continue;
+                }
+                int orientacao = orientacao(pontoAtual, ponto, proximoPonto);
+                if (orientacao == -1
+                        || orientacao == 0 && distancia(pontoAtual, ponto) > distancia(pontoAtual, proximoPonto)) {
+                    proximoPonto = ponto;
+                }
+            }
+
+            hull.add(proximoPonto);
+            pontoAtual = proximoPonto;
+        } while (!proximoPonto.equals(pontoMaisEsquerda));
+
+        return hull;
+    }
+
+    public static int orientacao(Point2D p, Point2D q, Point2D r) {
+        double valor = (q.getY() - p.getY()) * (r.getX() - q.getX()) - (q.getX() - p.getX()) * (r.getY() - q.getY());
+
+        if (valor == 0) {
+            return 0; // pontos colineares
+        }
+        return (valor > 0) ? 1 : -1; // sentido horário ou anti-horário
+    }
+
+    public static double distancia(Point2D p1, Point2D p2) {
+        double dx = p2.getX() - p1.getX();
+        double dy = p2.getY() - p1.getY();
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     public static ArrayList<Point2D> noThread(ArrayList<ArrayList<Point2D>> listaTringulos) {
@@ -122,71 +259,4 @@ public class planoConvexo {
         frame.setSize(400, 400);
         frame.setVisible(true);
     }
-
-    private static ArrayList<Point2D> merge(ArrayList<Point2D> pedaco1, ArrayList<Point2D> pedaco2) {
-        ArrayList<Point2D> resultado = new ArrayList<>();
-
-        // Adicione o código para mesclar os pedaços aqui
-        // ...
-        resultado.addAll(pedaco1);
-        resultado.addAll(pedaco2);
-        // Encontre o casco convexo dos pontos resultantes do merge
-        ArrayList<Point2D> convexHull = convexHull(resultado);
-
-        return convexHull;
-    }
-
-    private static ArrayList<Point2D> convexHull(ArrayList<Point2D> pontos) {
-        ArrayList<Point2D> hull = new ArrayList<>();
-
-        // Encontre o ponto mais à esquerda
-        Point2D pontoMaisEsquerda = pontos.get(0);
-        for (int i = 1; i < pontos.size(); i++) {
-            Point2D pontoAtual = pontos.get(i);
-            if (pontoAtual.getX() < pontoMaisEsquerda.getX()) {
-                pontoMaisEsquerda = pontoAtual;
-            }
-        }
-
-        hull.add(pontoMaisEsquerda);
-        Point2D pontoAtual = pontoMaisEsquerda;
-        Point2D proximoPonto;
-
-        do {
-            proximoPonto = pontos.get(0);
-
-            for (int i = 1; i < pontos.size(); i++) {
-                Point2D ponto = pontos.get(i);
-                if (ponto.equals(pontoAtual)) {
-                    continue;
-                }
-                int orientacao = orientacao(pontoAtual, ponto, proximoPonto);
-                if (orientacao == -1
-                        || orientacao == 0 && distancia(pontoAtual, ponto) > distancia(pontoAtual, proximoPonto)) {
-                    proximoPonto = ponto;
-                }
-            }
-
-            hull.add(proximoPonto);
-            pontoAtual = proximoPonto;
-        } while (!proximoPonto.equals(pontoMaisEsquerda));
-
-        return hull;
-    }
-
-    private static int orientacao(Point2D p, Point2D q, Point2D r) {
-        double valor = (q.getY() - p.getY()) * (r.getX() - q.getX()) - (q.getX() - p.getX()) * (r.getY() - q.getY());
-
-        if (valor == 0) {
-            return 0; // pontos colineares
-        }
-        return (valor > 0) ? 1 : -1; // sentido horário ou anti-horário
-    }
-
-    private static double distancia(Point2D p1, Point2D p2) {
-        double dx = p2.getX() - p1.getX();
-        double dy = p2.getY() - p1.getY();
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
 }
