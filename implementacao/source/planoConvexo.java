@@ -5,9 +5,16 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Random;
-import javax.swing.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import javax.swing.*;
 public class planoConvexo {
 
     /*
@@ -18,44 +25,41 @@ public class planoConvexo {
      * desenharTriangulos passando a lista de pontos e a lista de triangulos
      * 4ª Chamar o metodo onThread ou noThread passado a lista de triangulos
      * Exemplo de uso:
-     * 
-     * ArrayList<Point2D> listaDePontos = planoConvexo.gerarPontos();
-     * 
-     * ArrayList<ArrayList<Point2D>> listaTriangulo =
-     * planoConvexo.gerarTriagulos(listaDePontos);
-     * 
-     * long comecoSem = System.currentTimeMillis();
-     * ArrayList<Point2D> resultadoPlanoConvexoNoThread =
-     * planoConvexo.noThread(listaTriangulo);
-     * long fimSem = System.currentTimeMillis();
-     * 
-     * ArrayList<ArrayList<Point2D>> listaTriangulo2 = new
-     * ArrayList<>(listaTriangulo);
-     * listaTriangulo2.addAll(listaTriangulo);
-     * long comecoCom = System.currentTimeMillis();
-     * ArrayList<Point2D> resultadoPlanoConvexoOnThread =
-     * planoConvexo.onThread(listaTriangulo2);
-     * long fimCom = System.currentTimeMillis();
-     * System.out.println("Sem thread: " + (fimSem-comecoSem) + "ms");
-     * 
-     * 
-     * 
-     * System.out.println("Com thread: " + (fimCom-comecoCom) + "ms");
-     * planoConvexo.desenharPontosComLinhas(resultadoPlanoConvexoNoThread,
-     * listaDePontos);
+     * ArrayList<Point2D> listaDePontos = planoConvexo.gerarPontos(1000000);
+      ArrayList<ArrayList<Point2D>> listaTriangulo = planoConvexo.gerarTriagulos(listaDePontos);
+        
+       long comecoSem = System.currentTimeMillis();
+      ArrayList<Point2D> resultadoPlanoConvexoNoThread = planoConvexo.onThread(listaTriangulo);
+      long fimSem = System.currentTimeMillis();
+
+      long comecoCom = System.currentTimeMillis();
+      ArrayList<Point2D> resultadoPlanoConvexoOnThread = planoConvexo.onThread(listaTriangulo);
+      long fimCom = System.currentTimeMillis();
+
+
+      System.out.println("Sem thread: " + (fimSem-comecoSem) + "ms");
+      System.out.println("Com thread: " + (fimCom-comecoCom) + "ms");
+      planoConvexo.desenharPontosComLinhas(resultadoPlanoConvexoOnThread,listaDePontos);
      */
 
-    public static ArrayList<Point2D> gerarPontos() {
-        ArrayList<Point2D> listaPontos = new ArrayList<>();
-        Random random = new Random();
+    public static ArrayList<Point2D> gerarPontos(int qnt) {
+    ArrayList<Point2D> listaPontos = new ArrayList<>();
+    HashSet<Point2D> conjuntoPontos = new HashSet<>();
+    Random random = new Random();
 
-        // Gerar 10 pontos aleatórios
-        for (int i = 0; i < 100; i++) {
-            listaPontos.add(new Point2D.Double(random.nextInt(340) + 1, random.nextInt(340) + 1));
+    // Gerar 10 pontos aleatórios
+    listaPontos.add(new Point2D.Double(1, 1));
+    conjuntoPontos.add(new Point2D.Double(1, 1));
+
+    for (int i = 0; i < qnt; i++) {
+        Point2D ponto = new Point2D.Double(random.nextInt(900000000) + 1, random.nextInt(900000000) + 1);
+        if (conjuntoPontos.add(ponto)) {
+            listaPontos.add(ponto);
         }
-
-        return listaPontos;
     }
+
+    return listaPontos;
+}
 
     public static ArrayList<ArrayList<Point2D>> gerarTriagulos(ArrayList<Point2D> listaPontos) {
 
@@ -166,50 +170,48 @@ public class planoConvexo {
 
         ArrayList<Point2D> pedaco1 = new ArrayList<>();
         ArrayList<Point2D> pedaco2 = new ArrayList<>();
+        pedaco1 = noThread(new ArrayList<>(listaTringulos.subList(0, meio)));
 
-        pedaco1 = noThread(new ArrayList<ArrayList<Point2D>>(listaTringulos.subList(0, meio)));
         pedaco2 = noThread(new ArrayList<ArrayList<Point2D>>(listaTringulos.subList(meio, listaTringulos.size())));
         return merge(pedaco1, pedaco2);
     }
 
-    public static ArrayList<Point2D> onThread(ArrayList<ArrayList<Point2D>> listaTriangulos) {
+public static ArrayList<Point2D> onThread(ArrayList<ArrayList<Point2D>> listaTriangulos) {
         if (listaTriangulos.size() == 1) {
             return listaTriangulos.get(0);
         }
+
         int meio = listaTriangulos.size() / 2;
 
-        // Lista para armazenar os resultados
         ArrayList<Point2D> pedaco1 = new ArrayList<>();
         ArrayList<Point2D> pedaco2 = new ArrayList<>();
 
-        // Thread 1
-        Thread thread1 = new Thread(() -> {
-            pedaco1.addAll(onThread(new ArrayList<>(listaTriangulos.subList(0, meio))));
-        });
-        // Thread 2
-        Thread thread2 = new Thread(() -> {
-            pedaco2.addAll(onThread(new ArrayList<>(listaTriangulos.subList(meio, listaTriangulos.size()))));
-        });
+        ExecutorService executor = Executors.newFixedThreadPool(2);
 
-        // Iniciar as threads
-        thread1.start();
-        thread2.start();
+        Callable<ArrayList<Point2D>> tarefa1 = () -> noThread(new ArrayList<>(listaTriangulos.subList(0, meio)));
+        Callable<ArrayList<Point2D>> tarefa2 = () -> noThread(new ArrayList<>(listaTriangulos.subList(meio, listaTriangulos.size())));
+
+        Future<ArrayList<Point2D>> future1 = executor.submit(tarefa1);
+        Future<ArrayList<Point2D>> future2 = executor.submit(tarefa2);
 
         try {
-            // Aguardar a conclusão das threads
-            thread1.join();
-            thread2.join();
-        } catch (InterruptedException e) {
-            // Lidar com exceções
+            pedaco1 = future1.get();
+            pedaco2 = future2.get();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            return null;
         }
 
-        // Mesclar os resultados
+        executor.shutdown();
+
         return merge(pedaco1, pedaco2);
     }
 
+
     public static void desenharPontosComLinhas(ArrayList<Point2D> pontos, ArrayList<Point2D> listaPontos) {
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    int screenWidth = (int) screenSize.getWidth();
+    int screenHeight = (int) screenSize.getHeight();
         JFrame frame = new JFrame("Desenho de Pontos");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -218,14 +220,16 @@ public class planoConvexo {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-
+double escala = 0.000001;
+            g2d.scale(escala, escala);
                 // Desenhar os pontos
+                int tamanhoPonto = 9999999;
                 for (Point2D ponto : pontos) {
                     int x = (int) ponto.getX();
                     int y = (int) ponto.getY();
 
                     g2d.setColor(Color.RED);
-                    g2d.fillOval(x - 2, y - 2, 5, 5);
+                    g2d.fillOval(x - tamanhoPonto/2, y - tamanhoPonto/2, tamanhoPonto, tamanhoPonto);
                 }
 
                 for (Point2D ponto : listaPontos) {
@@ -234,7 +238,7 @@ public class planoConvexo {
                         int y = (int) ponto.getY();
 
                         g2d.setColor(Color.BLUE);
-                        g2d.fillOval(x - 2, y - 2, 5, 5);
+                        g2d.fillOval(x - tamanhoPonto/6, y - tamanhoPonto/6, tamanhoPonto/4, tamanhoPonto/4);
                     }
 
                 }
@@ -256,7 +260,9 @@ public class planoConvexo {
         };
 
         frame.getContentPane().add(panel);
-        frame.setSize(400, 400);
-        frame.setVisible(true);
+    frame.setSize(screenWidth, screenHeight); // Definir o tamanho da janela com base na resolução da tela
+    frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar a janela para preencher a tela
+    frame.setVisible(true);
+    
     }
 }
