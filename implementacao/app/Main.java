@@ -1,60 +1,18 @@
 package implementacao.app;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import implementacao.source.Backtracking;
-import implementacao.source.ForcaBruta;
-import implementacao.source.Guloso;
-import implementacao.source.ProgramacaoDinamica;
+import implementacao.source.*;
 
 public class Main {
     private static final double MAX_ITERATIONS_FB = 70.0;
     private static final double MAX_ITERATIONS_GLOBAL = 1000.0;
 
     public static void main(String[] args) {
-        ForcaBruta forcaBruta = new ForcaBruta();
-        Backtracking backtracking = new Backtracking();
-        ProgramacaoDinamica programacaoDinamica = new ProgramacaoDinamica();
 
-        int[][] grafo = grafoCompletoPonderado(10);
-
-        System.out.println("----------------------Força Bruta------------------------");
-
-        long startTimeBrute = System.currentTimeMillis();
-        forcaBruta.encontrarCaminhoMinimo(grafo);
-        List<Integer> caminhoMinimoBrute = forcaBruta.getCaminhoMinimo();
-        caminhoMinimoBrute.forEach(System.out::print);
-        long endTimeBrute = System.currentTimeMillis();
-        long elapsedTimeBrute = endTimeBrute - startTimeBrute;
-
-        System.out.println("\n----------------------Backtracking------------------------");
-
-        long startTimeBacktracking = System.currentTimeMillis();
-        backtracking.encontrarCaminhoMinimo(grafo);
-        List<Integer> caminhoMinimoBack = backtracking.getCaminhoMinimo();
-        caminhoMinimoBack.forEach(System.out::print);
-        long endTimeBacktracking = System.currentTimeMillis();
-        long elapsedTimeBacktracking = endTimeBacktracking - startTimeBacktracking;
-
-        System.out.println("\n----------------------Programação Dinâmica------------------------");
-
-        long startTimePD = System.currentTimeMillis();
-        programacaoDinamica.encontrarCaminhoMinimo(grafo);
-        List<Integer> caminhoMinimoPD = programacaoDinamica.getCaminhoMinimo();
-        caminhoMinimoPD.forEach(System.out::print);
-        long endTimePD = System.currentTimeMillis();
-        long elapsedTimePD = endTimePD - startTimePD;
-
-        System.out.println("\nO tempo do força bruta foi de: " + elapsedTimeBrute + "ms");
-        System.out.println("O tempo do backtracking foi de: " + elapsedTimeBacktracking + "ms");
-        System.out.println("O tempo da programação dinâmica foi de: " + elapsedTimePD + "ms");
-
-        System.out.println();
-        testAlgorithms();
-    }
-
-    public static void testAlgorithms() {
         int vertices = obterNMenosUm(), countSameAnswer = 0;
         long totalTimeFB = 0, totalTimeG = 0, totalTimeBackTranking = 0, totalTimePD = 0;
 
@@ -64,10 +22,11 @@ public class Main {
         ProgramacaoDinamica programacaoDinamica = new ProgramacaoDinamica();
 
         try {
+
             for (int i = 0; i < MAX_ITERATIONS_GLOBAL; i++) {
                 int[][] grafo = grafoCompletoPonderado(vertices);
 
-                //* Força Bruta
+                // * Força Bruta
 
                 long startTime = System.currentTimeMillis();
                 forcaBruta.encontrarCaminhoMinimo(grafo);
@@ -78,7 +37,7 @@ public class Main {
                 long elapsedTime = endTime - startTime;
                 totalTimeFB += elapsedTime;
 
-                //* Guloso
+                // * Guloso
 
                 startTime = System.currentTimeMillis();
                 guloso.encontrarCaminhoMinimo(grafo);
@@ -89,7 +48,7 @@ public class Main {
                 elapsedTime = endTime - startTime;
                 totalTimeG += elapsedTime;
 
-                //* Backtracking
+                // * Backtracking
 
                 startTime = System.currentTimeMillis();
                 backtracking.encontrarCaminhoMinimo(grafo);
@@ -100,7 +59,7 @@ public class Main {
                 elapsedTime = endTime - startTime;
                 totalTimeBackTranking += elapsedTime;
 
-                //* Programação Dinâmica
+                // * Programação Dinâmica
 
                 startTime = System.currentTimeMillis();
                 programacaoDinamica.encontrarCaminhoMinimo(grafo);
@@ -111,7 +70,8 @@ public class Main {
                 elapsedTime = endTime - startTime;
                 totalTimePD += elapsedTime;
 
-                if (compararListas(caminhoMinimoFB, caminhoMinimoG, caminhoMinimoBacktracking, caminhoMinimoPD)) {
+                if (compararListas(caminhoMinimoFB, caminhoMinimoG,
+                        caminhoMinimoBacktracking, caminhoMinimoPD)) {
                     countSameAnswer++;
                 }
             }
@@ -128,9 +88,12 @@ public class Main {
 
             System.out.println();
 
-            double averageTimebacktracking = totalTimeBackTranking / MAX_ITERATIONS_GLOBAL;
-            System.out.println("Tempo total das iterações Backtracking: " + totalTimeBackTranking + "ms");
-            System.out.println("Tempo médio das iterações Backtracking: " + averageTimebacktracking + "ms");
+            double averageTimebacktracking = totalTimeBackTranking /
+                    MAX_ITERATIONS_GLOBAL;
+            System.out.println("Tempo total das iterações Backtracking: " +
+                    totalTimeBackTranking + "ms");
+            System.out.println("Tempo médio das iterações Backtracking: " +
+                    averageTimebacktracking + "ms");
 
             System.out.println();
 
@@ -138,16 +101,15 @@ public class Main {
             System.out.println("Tempo total das iterações PD: " + totalTimePD + "ms");
             System.out.println("Tempo médio das iterações PD: " + averageTimePD + "ms");
 
-            System.out.println();
-
-            System.out.println("Quantidade de soluções iguais obtidas: " + countSameAnswer);
+            System.out.println("\nQuantidade de soluções iguais obtidas: " + countSameAnswer);
         } catch (Exception err) {
             err.printStackTrace();
-            System.out.println(err.getMessage());
+            System.err.println(err.getMessage());
         }
     }
 
-    public static boolean compararListas(List<Integer> lista1, List<Integer> lista2, List<Integer> lista3, List<Integer> lista4) {
+    public static boolean compararListas(List<Integer> lista1, List<Integer> lista2, List<Integer> lista3,
+            List<Integer> lista4) {
         if (lista1.size() != lista2.size() || lista1.size() != lista3.size() || lista1.size() != lista4.size()) {
             return false;
         }
@@ -193,7 +155,7 @@ public class Main {
 
             if (minusFourMin) {
                 vertices++;
-            } else break;
+            }
         }
 
         long endTotalTime = System.currentTimeMillis();
