@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.*;
+
 public class planoConvexo {
 
     /*
@@ -26,40 +27,43 @@ public class planoConvexo {
      * 4ª Chamar o metodo onThread ou noThread passado a lista de triangulos
      * Exemplo de uso:
      * ArrayList<Point2D> listaDePontos = planoConvexo.gerarPontos(1000000);
-      ArrayList<ArrayList<Point2D>> listaTriangulo = planoConvexo.gerarTriagulos(listaDePontos);
-        
-       long comecoSem = System.currentTimeMillis();
-      ArrayList<Point2D> resultadoPlanoConvexoNoThread = planoConvexo.onThread(listaTriangulo);
-      long fimSem = System.currentTimeMillis();
-
-      long comecoCom = System.currentTimeMillis();
-      ArrayList<Point2D> resultadoPlanoConvexoOnThread = planoConvexo.onThread(listaTriangulo);
-      long fimCom = System.currentTimeMillis();
-
-
-      System.out.println("Sem thread: " + (fimSem-comecoSem) + "ms");
-      System.out.println("Com thread: " + (fimCom-comecoCom) + "ms");
-      planoConvexo.desenharPontosComLinhas(resultadoPlanoConvexoOnThread,listaDePontos);
+     * ArrayList<ArrayList<Point2D>> listaTriangulo =
+     * planoConvexo.gerarTriagulos(listaDePontos);
+     * 
+     * long comecoSem = System.currentTimeMillis();
+     * ArrayList<Point2D> resultadoPlanoConvexoNoThread =
+     * planoConvexo.onThread(listaTriangulo);
+     * long fimSem = System.currentTimeMillis();
+     * 
+     * long comecoCom = System.currentTimeMillis();
+     * ArrayList<Point2D> resultadoPlanoConvexoOnThread =
+     * planoConvexo.onThread(listaTriangulo);
+     * long fimCom = System.currentTimeMillis();
+     * 
+     * 
+     * System.out.println("Sem thread: " + (fimSem-comecoSem) + "ms");
+     * System.out.println("Com thread: " + (fimCom-comecoCom) + "ms");
+     * planoConvexo.desenharPontosComLinhas(resultadoPlanoConvexoOnThread,
+     * listaDePontos);
      */
 
     public static ArrayList<Point2D> gerarPontos(int qnt) {
-    ArrayList<Point2D> listaPontos = new ArrayList<>();
-    HashSet<Point2D> conjuntoPontos = new HashSet<>();
-    Random random = new Random();
+        ArrayList<Point2D> listaPontos = new ArrayList<>();
+        HashSet<Point2D> conjuntoPontos = new HashSet<>();
+        Random random = new Random();
 
-    // Gerar 10 pontos aleatórios
-    listaPontos.add(new Point2D.Double(1, 1));
-    conjuntoPontos.add(new Point2D.Double(1, 1));
+        // Gerar 10 pontos aleatórios
 
-    for (int i = 0; i < qnt; i++) {
-        Point2D ponto = new Point2D.Double(random.nextInt(900000000) + 1, random.nextInt(900000000) + 1);
-        if (conjuntoPontos.add(ponto)) {
-            listaPontos.add(ponto);
+
+        for (int i = 0; i < qnt; i++) {
+            Point2D ponto = new Point2D.Double(random.nextInt(900000000) + 1, random.nextInt(900000000) + 1);
+            if (conjuntoPontos.add(ponto)) {
+                listaPontos.add(ponto);
+            }
         }
-    }
 
-    return listaPontos;
-}
+        return listaPontos;
+    }
 
     public static ArrayList<ArrayList<Point2D>> gerarTriagulos(ArrayList<Point2D> listaPontos) {
 
@@ -176,7 +180,7 @@ public class planoConvexo {
         return merge(pedaco1, pedaco2);
     }
 
-public static ArrayList<Point2D> onThread(ArrayList<ArrayList<Point2D>> listaTriangulos) {
+    public static ArrayList<Point2D> onThread(ArrayList<ArrayList<Point2D>> listaTriangulos) {
         if (listaTriangulos.size() == 1) {
             return listaTriangulos.get(0);
         }
@@ -189,7 +193,8 @@ public static ArrayList<Point2D> onThread(ArrayList<ArrayList<Point2D>> listaTri
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
         Callable<ArrayList<Point2D>> tarefa1 = () -> noThread(new ArrayList<>(listaTriangulos.subList(0, meio)));
-        Callable<ArrayList<Point2D>> tarefa2 = () -> noThread(new ArrayList<>(listaTriangulos.subList(meio, listaTriangulos.size())));
+        Callable<ArrayList<Point2D>> tarefa2 = () -> noThread(
+                new ArrayList<>(listaTriangulos.subList(meio, listaTriangulos.size())));
 
         Future<ArrayList<Point2D>> future1 = executor.submit(tarefa1);
         Future<ArrayList<Point2D>> future2 = executor.submit(tarefa2);
@@ -206,63 +211,66 @@ public static ArrayList<Point2D> onThread(ArrayList<ArrayList<Point2D>> listaTri
         return merge(pedaco1, pedaco2);
     }
 
+   public static void desenharPontosComLinhas(ArrayList<Point2D> pontos, ArrayList<Point2D> listaPontos) {
 
-    public static void desenharPontosComLinhas(ArrayList<Point2D> pontos, ArrayList<Point2D> listaPontos) {
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    JFrame frame = new JFrame("Desenho de Pontos");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    int screenWidth = (int) screenSize.getWidth();
-    int screenHeight = (int) screenSize.getHeight();
-        JFrame frame = new JFrame("Desenho de Pontos");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    JPanel panel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
 
-        JPanel panel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-double escala = 0.000001;
+            int panelWidth = getWidth() / 2; // Define a largura do painel como metade da largura do painel
+            int panelHeight = getHeight() / 2; // Define a altura do painel como metade da altura do painel
+            int panelX = (getWidth() - panelWidth) / 2; // Calcula a posição X do painel para que fique no centro horizontal do painel
+            int panelY = (getHeight() - panelHeight) / 7; // Calcula a posição Y do painel para que fique no centro vertical do painel
+            g2d.translate(panelX, panelY); // Translada o sistema de coordenadas para o centro do painel
+
+            double escala = 0.000001;
             g2d.scale(escala, escala);
-                // Desenhar os pontos
-                int tamanhoPonto = 9999999;
-                for (Point2D ponto : pontos) {
+
+            // Desenhar os pontos
+            int tamanhoPonto = 9999999;
+            for (Point2D ponto : pontos) {
+                int x = (int) ponto.getX();
+                int y = (int) ponto.getY();
+
+                g2d.setColor(Color.RED);
+                g2d.fillOval(x - tamanhoPonto, y - tamanhoPonto, tamanhoPonto * 2, tamanhoPonto * 2);
+            }
+
+            for (Point2D ponto : listaPontos) {
+                if (!pontos.contains(ponto)) {
                     int x = (int) ponto.getX();
                     int y = (int) ponto.getY();
 
-                    g2d.setColor(Color.RED);
-                    g2d.fillOval(x - tamanhoPonto/2, y - tamanhoPonto/2, tamanhoPonto, tamanhoPonto);
-                }
-
-                for (Point2D ponto : listaPontos) {
-                    if (!pontos.contains(ponto)) {
-                        int x = (int) ponto.getX();
-                        int y = (int) ponto.getY();
-
-                        g2d.setColor(Color.BLUE);
-                        g2d.fillOval(x - tamanhoPonto/6, y - tamanhoPonto/6, tamanhoPonto/4, tamanhoPonto/4);
-                    }
-
-                }
-
-                // Desenhar as linhas
-                for (int i = 0; i < pontos.size() - 1; i++) {
-                    Point2D ponto1 = pontos.get(i);
-                    Point2D ponto2 = pontos.get(i + 1);
-
-                    int x1 = (int) ponto1.getX();
-                    int y1 = (int) ponto1.getY();
-                    int x2 = (int) ponto2.getX();
-                    int y2 = (int) ponto2.getY();
-
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawLine(x1, y1, x2, y2);
+                    g2d.setColor(Color.BLUE);
+                    g2d.fillOval(x - tamanhoPonto / 12, y - tamanhoPonto / 12, tamanhoPonto / 8, tamanhoPonto / 8);
                 }
             }
-        };
 
-        frame.getContentPane().add(panel);
-    frame.setSize(screenWidth, screenHeight); // Definir o tamanho da janela com base na resolução da tela
+            // Desenhar as linhas
+            for (int i = 0; i < pontos.size() - 1; i++) {
+                Point2D ponto1 = pontos.get(i);
+                Point2D ponto2 = pontos.get(i + 1);
+
+                int x1 = (int) ponto1.getX();
+                int y1 = (int) ponto1.getY();
+                int x2 = (int) ponto2.getX();
+                int y2 = (int) ponto2.getY();
+
+                g2d.setColor(Color.BLACK);
+                g2d.drawLine(x1, y1, x2, y2);
+            }
+        }
+    };
+
+    frame.getContentPane().add(panel);
     frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar a janela para preencher a tela
     frame.setVisible(true);
-    
-    }
+}
+
 }
