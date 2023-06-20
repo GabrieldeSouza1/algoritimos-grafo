@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+
 
 import javax.swing.*;
 
@@ -102,8 +102,6 @@ public class planoConvexo {
     public static ArrayList<Point2D> merge(ArrayList<Point2D> pedaco1, ArrayList<Point2D> pedaco2) {
         ArrayList<Point2D> resultado = new ArrayList<>();
 
-        // Adicione o código para mesclar os pedaços aqui
-        // ...
         resultado.addAll(pedaco1);
         resultado.addAll(pedaco2);
         // Encontre o casco convexo dos pontos resultantes do merge
@@ -213,7 +211,7 @@ public class planoConvexo {
 
    public static void desenharPontosComLinhas(ArrayList<Point2D> pontos, ArrayList<Point2D> listaPontos) {
 
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
     JFrame frame = new JFrame("Desenho de Pontos");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

@@ -217,6 +217,55 @@ public class Main {
             err.printStackTrace();
             System.err.println(err.getMessage());
         }
+
+
+        // Testes plano convexo
+
+        ArrayList<Long> tempoNoThread = new ArrayList<Long>();
+        ArrayList<Long> tempoOnThread = new ArrayList<Long>();
+        for (int i = 0; i < 50; i++) {
+            ArrayList<Point2D> listaDePontos = planoConvexo.gerarPontos(1000000);
+            ArrayList<ArrayList<Point2D>> listaTriangulo = planoConvexo.gerarTriagulos(listaDePontos);
+            long comeco = 0;
+            long fim = 0;
+            comeco = System.currentTimeMillis();
+            planoConvexo.onThread(listaTriangulo);
+            fim = System.currentTimeMillis();
+
+            tempoOnThread.add(fim - comeco);
+
+            comeco = System.currentTimeMillis();
+            planoConvexo.noThread(listaTriangulo);
+            fim = System.currentTimeMillis();
+
+            tempoNoThread.add(fim - comeco);
+            System.out.println("Rodou: " + i);
+
+        }
+        long soma = 0;
+        for (Long numero : tempoNoThread) {
+            soma += numero;
+        }
+
+        // Calcule a média
+        double media = 0;
+        if (!tempoNoThread.isEmpty()) {
+            media = (double) soma / tempoNoThread.size();
+        }
+        System.out.println("Tempo medio das iterações sem thread: " + media);
+
+        long somaCom = 0;
+        for (Long numero : tempoOnThread) {
+            somaCom += numero;
+        }
+
+        // Calcule a média
+        double mediaCom = 0;
+        if (!tempoNoThread.isEmpty()) {
+            mediaCom = (double) somaCom / tempoNoThread.size();
+        }
+        System.out.println("Tempo medio das iterações com thread: " + mediaCom);
+
     }
 
     public static boolean compararListas(List<Integer> lista1, List<Integer> lista2, List<Integer> lista3,
