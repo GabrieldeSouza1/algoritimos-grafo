@@ -111,7 +111,9 @@ public class Main {
             System.err.println(err.getMessage());
         }
 
-        // Testes plano convexo
+        // * Testes Envoltória Convexa
+
+        System.out.println("\n Envoltória Convexa: \n");
 
         ArrayList<Long> tempoNoThread = new ArrayList<Long>();
         ArrayList<Long> tempoOnThread = new ArrayList<Long>();
@@ -143,7 +145,7 @@ public class Main {
         if (!tempoNoThread.isEmpty()) {
             media = (double) soma / tempoNoThread.size();
         }
-        System.out.println("Tempo medio das iterações sem thread: " + media);
+        System.out.println("Tempo medio das iterações sem thread: " + media + "ms");
 
         long somaCom = 0;
         for (Long numero : tempoOnThread) {
@@ -155,7 +157,7 @@ public class Main {
         if (!tempoNoThread.isEmpty()) {
             mediaCom = (double) somaCom / tempoNoThread.size();
         }
-        System.out.println("Tempo medio das iterações com thread: " + mediaCom);
+        System.out.println("Tempo medio das iterações com thread: " + mediaCom + "ms");
 
     }
 
