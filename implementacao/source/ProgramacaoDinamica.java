@@ -5,9 +5,13 @@ import java.util.List;
 
 public class ProgramacaoDinamica {
 
-    private static List<Integer> caminhoMinimo;
+    private List<Integer> caminhoMinimo;
+    private int[][] grafo;
+    private int custoTotal = 0;
 
     public void encontrarCaminhoMinimo(int[][] grafo) {
+        this.custoTotal = 0;
+        this.grafo = grafo;
         int n = grafo.length;
         caminhoMinimo = new ArrayList<>();
         int[][] tabela = new int[1 << n][n]; // Tabela de programação dinâmica
@@ -38,6 +42,7 @@ public class ProgramacaoDinamica {
         int ultimaCidade = 0;
         while (true) {
             caminhoMinimo.add(ultimaCidade);
+
             int proximoSubconjunto = subconjunto ^ (1 << ultimaCidade);
             if (proximoSubconjunto == 0) {
                 break;
@@ -55,10 +60,23 @@ public class ProgramacaoDinamica {
             }
             subconjunto = proximoSubconjunto;
         }
+
         caminhoMinimo.add(0); // Adicionar a cidade inicial novamente para fechar o ciclo
     }
 
     public List<Integer> getCaminhoMinimo() {
         return caminhoMinimo;
+    }
+
+    public int getCustoTotal() {
+        // Calcular o custo total do caminho mínimo
+        this.custoTotal = 0;
+        for (int i = 0; i < this.caminhoMinimo.size() - 1; i++) {
+            int cidadeAtual = caminhoMinimo.get(i);
+            int proximaCidade = caminhoMinimo.get(i + 1);
+            this.custoTotal += this.grafo[cidadeAtual][proximaCidade];
+        }
+
+        return custoTotal;
     }
 }

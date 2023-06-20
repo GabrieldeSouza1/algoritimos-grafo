@@ -1,11 +1,14 @@
 package implementacao.source;
+
 import java.util.*;
+
 public class Guloso {
 
     private List<Integer> caminhoMinimo;
-    private int menorCusto = 0;
+    private int custoTotal = 0;
 
     public void encontrarCaminhoMinimo(int[][] grafo) {
+        this.custoTotal = 0;
         caminhoMinimo = new ArrayList<>();
 
         boolean[] visitados = new boolean[grafo.length];
@@ -15,24 +18,27 @@ public class Guloso {
         caminhoMinimo.add(0);
     }
 
-    private void encontrarCaminhoMinimo(int[][] grafo, int nivel, List<Integer> caminhoAtual, boolean[] visitados, int custoAtual) {
+    private void encontrarCaminhoMinimo(int[][] grafo, int nivel, List<Integer> caminhoAtual, boolean[] visitados,
+            int custoAtual) {
         if (acabou(visitados)) {
             return;
         }
+
         int proximo = melhorAtual(grafo, nivel, visitados);
         caminhoMinimo.add(nivel);
         visitados[nivel] = true;
-        menorCusto += grafo[nivel][proximo];
+        this.custoTotal += grafo[nivel][proximo];
+        ;
         encontrarCaminhoMinimo(grafo, proximo, caminhoMinimo, visitados, custoAtual);
     }
 
-    private int melhorAtual(int[][] grafo, int nivel, boolean[] visitados){
+    private int melhorAtual(int[][] grafo, int nivel, boolean[] visitados) {
         int melhorAtual = Integer.MAX_VALUE;
 
         int proximoVertice = 0;
 
-        for(int i = 0; i < grafo.length; i++){
-            if(grafo[nivel][i] > 0 && grafo[nivel][i] < melhorAtual && !visitados[i]){
+        for (int i = 0; i < grafo.length; i++) {
+            if (grafo[nivel][i] > 0 && grafo[nivel][i] < melhorAtual && !visitados[i]) {
                 melhorAtual = grafo[nivel][i];
                 proximoVertice = i;
             }
@@ -43,7 +49,7 @@ public class Guloso {
 
     private boolean acabou(boolean[] visitados) {
         for (boolean visitado : visitados) {
-            if(!visitado){
+            if (!visitado) {
                 return false;
             }
         }
@@ -52,10 +58,10 @@ public class Guloso {
     }
 
     public List<Integer> getCaminhoMinimo() {
-        return caminhoMinimo;
+        return this.caminhoMinimo;
     }
 
-    public int getMenorCusto() {
-        return menorCusto;
+    public int getCustoTotal() {
+        return this.custoTotal;
     }
 }

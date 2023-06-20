@@ -7,8 +7,10 @@ public class Backtracking {
 
     private List<Integer> caminhoMinimo;
     private int menorCusto = Integer.MAX_VALUE;
+    private int custoTotal = 0;
 
     public void encontrarCaminhoMinimo(int[][] grafo) {
+        this.custoTotal = 0;
         int n = grafo.length;
         caminhoMinimo = new ArrayList<>();
 
@@ -23,12 +25,14 @@ public class Backtracking {
         caminhoMinimo.add(0);
     }
 
-    private void encontrarCaminhoMinimo(int[][] grafo, int nivel, List<Integer> caminhoAtual, boolean[] visitados, int custoAtual) {
+    private void encontrarCaminhoMinimo(int[][] grafo, int nivel, List<Integer> caminhoAtual, boolean[] visitados,
+            int custoAtual) {
         if (nivel == grafo.length) {
             int custoTotal = custoAtual + grafo[caminhoAtual.get(caminhoAtual.size() - 1)][0];
 
             if (custoTotal < menorCusto) {
                 menorCusto = custoTotal;
+                this.custoTotal = custoTotal;
                 caminhoMinimo = new ArrayList<>(caminhoAtual);
             }
 
@@ -41,7 +45,8 @@ public class Backtracking {
                 caminhoAtual.add(i);
                 visitados[i] = true;
 
-                encontrarCaminhoMinimo(grafo, nivel + 1, caminhoAtual, visitados, custoAtual + grafo[caminhoAtual.get(caminhoAtual.size() - 2)][i]);
+                encontrarCaminhoMinimo(grafo, nivel + 1, caminhoAtual, visitados,
+                        custoAtual + grafo[caminhoAtual.get(caminhoAtual.size() - 2)][i]);
 
                 caminhoAtual.remove(caminhoAtual.size() - 1);
                 visitados[i] = false;
@@ -55,5 +60,9 @@ public class Backtracking {
 
     public int getMenorCusto() {
         return menorCusto;
+    }
+
+    public int getCustoTotal() {
+        return custoTotal;
     }
 }

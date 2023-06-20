@@ -13,128 +13,16 @@ public class Main {
     private static final double MAX_ITERATIONS_GLOBAL = 1000.0;
 
     public static void main(String[] args) {
-        int countSameAnswer = 0;
+        int vertices = 12, countSameAnswerFBAndG = 0, countSameAnswerBTAndPD = 0;
         long totalTimeFB = 0, totalTimeG = 0, totalTimeBackTranking = 0, totalTimePD = 0;
-
-        ForcaBruta forcaBruta = new ForcaBruta();
-        Guloso guloso = new Guloso();
-        Backtracking backtracking = new Backtracking();
-        ProgramacaoDinamica programacaoDinamica = new ProgramacaoDinamica();
-        StringBuilder inputBuilder = new StringBuilder();
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Digite o grafo de entrada:");
-            String line = null;
-
-            while (scanner.hasNextLine()) {
-                line = scanner.nextLine();
-
-                if (line.equals("FIM")) {
-                    break;
-                }
-
-                inputBuilder.append(line);
-                inputBuilder.append("\n");
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        String input = inputBuilder.toString().trim();
-
-        int[][] grafo = gerarGrafoPonderado(input);
-
-        // * Força Bruta
-
-        long startTime = System.currentTimeMillis();
-        System.out.println(startTime);
-        forcaBruta.encontrarCaminhoMinimo(grafo);
-        long endTime = System.currentTimeMillis();
-
-        List<Integer> caminhoMinimoFB = forcaBruta.getCaminhoMinimo();
-
-        long elapsedTime = endTime - startTime;
-        totalTimeFB += elapsedTime;
-
-        // * Guloso
-
-        startTime = System.currentTimeMillis();
-        guloso.encontrarCaminhoMinimo(grafo);
-        endTime = System.currentTimeMillis();
-
-        List<Integer> caminhoMinimoG = guloso.getCaminhoMinimo();
-
-        elapsedTime = endTime - startTime;
-        totalTimeG += elapsedTime;
-
-        // * Backtracking
-
-        startTime = System.currentTimeMillis();
-        backtracking.encontrarCaminhoMinimo(grafo);
-        endTime = System.currentTimeMillis();
-
-        List<Integer> caminhoMinimoBacktracking = backtracking.getCaminhoMinimo();
-
-        elapsedTime = endTime - startTime;
-        totalTimeBackTranking += elapsedTime;
-
-        // * Programação Dinâmica
-
-        startTime = System.currentTimeMillis();
-        programacaoDinamica.encontrarCaminhoMinimo(grafo);
-        endTime = System.currentTimeMillis();
-
-        List<Integer> caminhoMinimoPD = programacaoDinamica.getCaminhoMinimo();
-
-        elapsedTime = endTime - startTime;
-        totalTimePD += elapsedTime;
-
-        if (compararListas(caminhoMinimoFB, caminhoMinimoG,
-                caminhoMinimoBacktracking, caminhoMinimoPD)) {
-            countSameAnswer++;
-        }
-
-        double averageTimeFB = totalTimeFB / MAX_ITERATIONS_GLOBAL;
-        System.out.println("Tempo total das iterações FB: " + totalTimeFB + "ms");
-        System.out.println("Tempo médio das iterações FB: " + averageTimeFB + "ms");
-
-        System.out.println();
-
-        double averageTimeG = totalTimeG / MAX_ITERATIONS_GLOBAL;
-        System.out.println("Tempo total das iterações G: " + totalTimeG + "ms");
-        System.out.println("Tempo médio das iterações G: " + averageTimeG + "ms");
-
-        System.out.println();
-
-        double averageTimebacktracking = totalTimeBackTranking /
-                MAX_ITERATIONS_GLOBAL;
-        System.out.println("Tempo total das iterações Backtracking: " +
-                totalTimeBackTranking + "ms");
-        System.out.println("Tempo médio das iterações Backtracking: " +
-                averageTimebacktracking + "ms");
-
-        System.out.println();
-
-        double averageTimePD = totalTimePD / MAX_ITERATIONS_GLOBAL;
-        System.out.println("Tempo total das iterações PD: " + totalTimePD + "ms");
-        System.out.println("Tempo médio das iterações PD: " + averageTimePD + "ms");
-
-        System.out.println("\nQuantidade de soluções iguais obtidas: " + countSameAnswer);
-
-    }
-
-    public static void testAlgorithms() {
-        int vertices = obterNMenosUm(), countSameAnswer = 0;
-        long totalTimeFB = 0, totalTimeG = 0, totalTimeBackTranking = 0, totalTimePD = 0;
-
-        ForcaBruta forcaBruta = new ForcaBruta();
-        Guloso guloso = new Guloso();
-        Backtracking backtracking = new Backtracking();
-        ProgramacaoDinamica programacaoDinamica = new ProgramacaoDinamica();
 
         try {
-
             for (int i = 0; i < MAX_ITERATIONS_GLOBAL; i++) {
+                ForcaBruta forcaBruta = new ForcaBruta();
+                Guloso guloso = new Guloso();
+                Backtracking backtracking = new Backtracking();
+                ProgramacaoDinamica programacaoDinamica = new ProgramacaoDinamica();
+
                 int[][] grafo = grafoCompletoPonderado(vertices);
 
                 // * Força Bruta
@@ -143,7 +31,7 @@ public class Main {
                 forcaBruta.encontrarCaminhoMinimo(grafo);
                 long endTime = System.currentTimeMillis();
 
-                List<Integer> caminhoMinimoFB = forcaBruta.getCaminhoMinimo();
+                int custoTotalFB = forcaBruta.getCustoTotal();
 
                 long elapsedTime = endTime - startTime;
                 totalTimeFB += elapsedTime;
@@ -154,10 +42,14 @@ public class Main {
                 guloso.encontrarCaminhoMinimo(grafo);
                 endTime = System.currentTimeMillis();
 
-                List<Integer> caminhoMinimoG = guloso.getCaminhoMinimo();
+                int custoTotalG = guloso.getCustoTotal();
 
                 elapsedTime = endTime - startTime;
                 totalTimeG += elapsedTime;
+
+                if (custoTotalFB == custoTotalG) {
+                    countSameAnswerFBAndG++;
+                }
 
                 // * Backtracking
 
@@ -165,7 +57,7 @@ public class Main {
                 backtracking.encontrarCaminhoMinimo(grafo);
                 endTime = System.currentTimeMillis();
 
-                List<Integer> caminhoMinimoBacktracking = backtracking.getCaminhoMinimo();
+                int custoTotalBT = backtracking.getCustoTotal();
 
                 elapsedTime = endTime - startTime;
                 totalTimeBackTranking += elapsedTime;
@@ -176,14 +68,13 @@ public class Main {
                 programacaoDinamica.encontrarCaminhoMinimo(grafo);
                 endTime = System.currentTimeMillis();
 
-                List<Integer> caminhoMinimoPD = programacaoDinamica.getCaminhoMinimo();
+                int custoTotalPD = programacaoDinamica.getCustoTotal();
 
                 elapsedTime = endTime - startTime;
                 totalTimePD += elapsedTime;
 
-                if (compararListas(caminhoMinimoFB, caminhoMinimoG,
-                        caminhoMinimoBacktracking, caminhoMinimoPD)) {
-                    countSameAnswer++;
+                if (custoTotalBT == custoTotalPD) {
+                    countSameAnswerBTAndPD++;
                 }
             }
 
@@ -212,12 +103,13 @@ public class Main {
             System.out.println("Tempo total das iterações PD: " + totalTimePD + "ms");
             System.out.println("Tempo médio das iterações PD: " + averageTimePD + "ms");
 
-            System.out.println("\nQuantidade de soluções iguais obtidas: " + countSameAnswer);
+            System.out.println("\nQuantidade de soluções iguais obtidas para FB e Guloso: " + countSameAnswerFBAndG);
+            System.out.println(
+                    "Quantidade de soluções iguais obtidas para BackTracking e PD: " + countSameAnswerBTAndPD);
         } catch (Exception err) {
             err.printStackTrace();
             System.err.println(err.getMessage());
         }
-
 
         // Testes plano convexo
 
