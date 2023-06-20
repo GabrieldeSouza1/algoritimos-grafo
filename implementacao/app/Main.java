@@ -239,7 +239,6 @@ public class Main {
             fim = System.currentTimeMillis();
 
             tempoNoThread.add(fim - comeco);
-            System.out.println("Rodou: " + i);
 
         }
         long soma = 0;
